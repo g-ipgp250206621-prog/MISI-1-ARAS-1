@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misi Penyelamat Alam — Peneroka Hijau</title>
+<style>
+:root{--green:#16834b;--lime:#b8ef72;--dark:#174b35;--cream:#fff9df;--orange:#ffb347}
+*{box-sizing:border-box}
+body{margin:0;font-family:Trebuchet MS,Arial,sans-serif;color:var(--dark);background:linear-gradient(180deg,#a9e9ff 0%,#e5ffd2 62%,#8bd477 100%);min-height:100vh}
+button{font:inherit;cursor:pointer}
+.game{max-width:980px;margin:auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{background:#fff;border:3px solid #d8f5ad;border-radius:18px;padding:9px 15px;font-weight:900;box-shadow:0 4px 0 #75bd69}
+h1{font-size:clamp(1.65rem,4vw,2.8rem);text-align:center;margin:10px 0 2px;color:#116b3c;text-shadow:2px 3px #fff}
+.subtitle{text-align:center;margin:0 0 14px;font-weight:bold}
+.scene{position:relative;background:linear-gradient(#8cdbff 0 54%,#a6e77e 54%);border:5px solid white;border-radius:28px;min-height:175px;overflow:hidden;box-shadow:0 8px 0 #69b96d;padding:12px}
+.sun{position:absolute;right:7%;top:12px;font-size:52px}
+.cloud{position:absolute;left:8%;top:20px;font-size:42px}
+.hills{position:absolute;bottom:0;left:0;width:100%;font-size:48px;white-space:nowrap;letter-spacing:12px}
+.hero{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:15px;padding:10px}
+.dino{font-size:clamp(68px,12vw,100px);filter:drop-shadow(0 5px 1px #5d9d51);animation:bob 2s infinite ease-in-out}
+@keyframes bob{50%{transform:translateY(-8px) rotate(3deg)}}
+.speech{background:white;border:3px solid #b8e98b;border-radius:20px;padding:12px 16px;max-width:470px;font-weight:bold;box-shadow:0 4px 0 #72b85e}
+.progress-wrap{background:#fff;border-radius:30px;padding:5px;margin:14px 0 10px;border:2px solid #c9ed9d}
+.progress{height:15px;background:linear-gradient(90deg,#36bd69,#b5e94f);border-radius:20px;width:0%;transition:width .4s}
+.card{background:var(--cream);border:4px solid white;border-radius:25px;padding:clamp(16px,3vw,28px);box-shadow:0 8px 0 #9acb75}
+.mission{text-transform:uppercase;letter-spacing:1px;color:#e27b18;font-weight:900;font-size:.9rem}
+.question{font-size:clamp(1.2rem,3vw,1.65rem);font-weight:900;margin:9px 0 18px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer{border:3px solid #b5d98c;background:#fff;border-radius:17px;padding:15px;text-align:left;font-weight:800;color:#285b3c;min-height:66px;box-shadow:0 4px 0 #c4dca4;transition:.15s}
+.answer:hover{transform:translateY(-3px);border-color:#57b86b;background:#f1ffe7}
+.answer:disabled{cursor:default;opacity:1}
+.answer.correct{background:#c9ffd1;border-color:#1caa51;box-shadow:0 4px 0 #69c786}
+.answer.wrong{background:#ffe0d9;border-color:#ed725f;box-shadow:0 4px 0 #eaa092}
+.feedback{min-height:54px;margin:14px 0 4px;font-weight:900;font-size:1.05rem}
+.next,.start,.restart{background:linear-gradient(#ffcf62,#ff9c32);border:0;border-radius:18px;padding:13px 24px;font-weight:1000;color:#603b0c;box-shadow:0 5px 0 #d77922}
+.next:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score{font-weight:900;background:#e7ffd0;padding:10px 14px;border-radius:14px}
+.center{text-align:center}
+.hidden{display:none!important}
+.big{font-size:clamp(3rem,12vw,6rem)}
+.result h2{font-size:clamp(1.7rem,5vw,2.6rem);margin:5px}
+.stars{font-size:2rem;letter-spacing:5px}
+.footer{text-align:center;font-size:.82rem;margin:18px 0 5px;font-weight:bold;color:#286443}
+@media(max-width:600px){.answers{grid-template-columns:1fr}.scene{min-height:155px}.speech{font-size:.92rem}.top{justify-content:center}}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="top">
+    <div class="badge">🌿 ARAS 1 • PENEROKA HIJAU</div>
+    <div class="badge">⭐ Mata: <span id="score">0</span> / 40</div>
+  </div>
+  <h1>🌍 MISI PENYELAMAT ALAM!</h1>
+  <p class="subtitle">Bantu si Dino menyelamatkan bumi. Selesaikan 4 misi untuk menjadi Wira Hijau!</p>
+
+  <section class="scene">
+    <div class="sun">☀️</div><div class="cloud">☁️</div>
+    <div class="hero">
+      <div class="dino" id="dino">🦖</div>
+      <div class="speech" id="speech">Hai, Peneroka Hijau! Bumi perlukan bantuan kita. Jom mulakan pengembaraan!</div>
+    </div>
+    <div class="hills">🌳　🌼　🌿　🌳　🌷　🌲</div>
+  </section>
+
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+
+  <section class="card" id="quiz">
+    <div class="mission" id="mission">MISI 1 • KENALI KITAR SEMULA</div>
+    <div class="question" id="question">Apakah maksud kitar semula?</div>
+    <div class="answers" id="answers"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="actions">
+      <div class="score">🏅 <span id="done">0</span>/4 misi selesai</div>
+      <button class="next" id="next" disabled>Seterusnya ➜</button>
+    </div>
+  </section>
+
+  <section class="card result center hidden" id="result">
+    <div class="big">🏆🌎🎉</div>
+    <h2>TAHNIAH, WIRA HIJAU!</h2>
+    <div class="stars">⭐ ⭐ ⭐</div>
+    <p id="resultText">Kamu berjaya menyelesaikan semua misi!</p>
+    <p>Teruskan amalan kitar semula untuk menjaga bumi kita. 🌱</p>
+    <button class="restart" onclick="restartGame()">↻ Main Semula</button>
+  </section>
+  <div class="footer">💚 Bumi bersih, hidup ceria! • Permainan Pendidikan Alam Sekitar</div>
+</div>
+<script>
+const data=[
+ {title:"MISI 1 • KENALI KITAR SEMULA",q:"Apakah maksud kitar semula?",a:["Membuang semua bahan terpakai.","Memproses bahan terpakai supaya boleh digunakan semula.","Membakar bahan buangan.","Menanam semua bahan terpakai."],correct:1,ok:"Hebat! Kitar semula menukar bahan terpakai menjadi bahan yang boleh digunakan semula. 🌱",bad:"Belum tepat. Fikirkan cara bahan terpakai diproses supaya boleh digunakan semula."},
+ {title:"MISI 2 • PEMBURU BAHAN KITAR SEMULA",q:"Antara berikut, yang manakah bahan yang boleh dikitar semula?",a:["Kertas, plastik dan kaca.","Makanan basi, tanah dan air.","Daun kering, pasir dan batu.","Minyak masak, tanah dan air."],correct:0,ok:"Tepat sekali! Kertas, plastik dan kaca ialah bahan yang boleh dikitar semula. ♻️",bad:"Cuba lagi! Cari pilihan yang mengandungi kertas, plastik dan kaca."},
+ {title:"MISI 3 • CARI DESTINASI",q:"Ke manakah bahan kitar semula boleh dihantar?",a:["Pusat membeli-belah.","Pusat kitar semula.","Taman permainan.","Padang sekolah."],correct:1,ok:"Bagus! Bahan kitar semula boleh dihantar ke pusat kitar semula. 🚛",bad:"Belum betul. Pilih tempat khas untuk mengumpulkan bahan kitar semula."},
+ {title:"MISI 4 • WIRA BEBAS PLASTIK",q:"Apakah amalan yang boleh mengurangkan penggunaan plastik?",a:["Menggunakan beg plastik baharu setiap hari.","Membuang botol plastik ke dalam sungai.","Membawa botol air sendiri.","Membakar beg plastik."],correct:2,ok:"Terbaik! Membawa botol air sendiri membantu mengurangkan penggunaan plastik sekali guna. 💚",bad:"Cuba lagi. Pilih amalan yang mengurangkan penggunaan plastik sekali guna."}
+];
+let index=0,score=0,answered=false;
+const $=id=>document.getElementById(id);
+function render(){
+ const item=data[index];answered=false;
+ $("mission").textContent=item.title;$("question").textContent=item.q;
+ $("feedback").textContent="Pilih satu jawapan yang paling tepat. 💡";
+ $("answers").innerHTML="";
+ item.a.forEach((choice,i)=>{
+  const b=document.createElement("button");b.className="answer";
+  b.innerHTML=`<strong>${"ABCD"[i]}.</strong> ${choice}`;
+  b.onclick=()=>choose(i,b);$("answers").appendChild(b);
+ });
+ $("next").disabled=true;$("next").textContent=index===3?"Lihat Keputusan 🏆":"Seterusnya ➜";
+ $("done").textContent=index;$("progress").style.width=(index/4*100)+"%";
+ $("speech").textContent=["Mari kenali maksud kitar semula!","Sekarang, cari bahan yang boleh dikitar semula!","Bagus! Mari cari destinasi bahan kitar semula.","Misi terakhir! Jadilah wira bebas plastik!"][index];
+ $("dino").textContent=["🦖","🦕","🦖","🦕"][index];
+}
+function choose(i,button){
+ if(answered)return;answered=true;
+ const item=data[index],buttons=[...$("answers").children];
+ buttons.forEach(b=>b.disabled=true);
+ if(i===item.correct){score+=10;button.classList.add("correct");$("feedback").textContent="✅ "+item.ok;$("dino").textContent="🦖🎉";}
+ else{button.classList.add("wrong");buttons[item.correct].classList.add("correct");$("feedback").textContent="💡 "+item.bad+" Jawapan yang betul ditandakan dengan warna hijau.";$("dino").textContent="🦖💚";}
+ $("score").textContent=score;$("next").disabled=false;
+}
+$("next").onclick=()=>{
+ if(!answered)return;
+ if(index<data.length-1){index++;render();}
+ else{ $("quiz").classList.add("hidden");$("result").classList.remove("hidden");$("progress").style.width="100%";$("done").textContent="4";$("resultText").textContent=`Markah kamu: ${score}/40. ${score===40?"Sempurna! Kamu Wira Hijau Terbilang!":score>=20?"Syabas! Kamu semakin hebat menjaga bumi!":"Terus berlatih! Setiap usaha membantu bumi."}`;$("speech").textContent="Kita berjaya! Terima kasih kerana menyelamatkan bumi!";$("dino").textContent="🦖🏆";}
+};
+function restartGame(){index=0;score=0;$("score").textContent=0;$("result").classList.add("hidden");$("quiz").classList.remove("hidden");render();}
+render();
+</script>
+</body>
+</html>
